@@ -1,3 +1,5 @@
+//dom
+
 const playersList = document.getElementById('players-list');
 const filterBtns = document.querySelectorAll('.filters .btn');
 const darkModeBtn = document.getElementById('dark-mode-btn');
@@ -6,9 +8,18 @@ const searchInput = document.getElementById('player-search');
 const hofGrid = document.getElementById('hof-grid');
 const timelineBox = document.getElementById('timeline-box');
 
-//squad
+//theme
+
+darkModeBtn?.addEventListener('click', () => {
+  document.body.classList.toggle('dark-mode');
+  setTimeout(renderCharts, 50);
+});
+
+//roster 2026
+
 function renderPlayers(data) {
   if (!playersList) return;
+
   playersList.innerHTML = ''; 
   
   if (data.length === 0) {
@@ -38,11 +49,22 @@ function renderPlayers(data) {
           </div>
 
           <div class="card-back">
-            <h3 style="font-family: var(--font-heading); font-size: 2.5rem; color: var(--bg-color); margin-bottom: 1.5rem; text-transform: uppercase;">
-              ${player.name}
-            </h3>
-            <div class="stats-container">
-              ${statsStr}
+            <div class="attax-header">
+              <div class="attax-name">${player.name}</div>
+              <div class="attax-role-nat">${player.role} // ${player.nationality}</div>
+            </div>
+      
+            <div class="attax-bio">
+              ${player.bio}
+            </div>
+
+            <div class="attax-stats-grid">
+              ${Object.entries(player.stats).map(([label, value]) => `
+                <div class="attax-stat-row">
+                  <div class="attax-label">${label.toUpperCase()}</div>
+                  <div class="attax-value">${value}</div>
+                </div>
+              `).join('')}
             </div>
           </div>
 
@@ -58,7 +80,26 @@ function renderPlayers(data) {
 if (typeof players !== 'undefined') {
   renderPlayers(players); 
 }
+
+//scroll
+
+const scrollObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('in-view');
+    }
+  });
+}, { threshold: 0.1 });
+
+function observeCards() {
+  setTimeout(() => {
+    const cards = document.querySelectorAll('.card');
+    cards.forEach(card => scrollObserver.observe(card));
+  }, 100);
+}
+
 //search
+
 searchInput?.addEventListener('input', (e) => {
   const term = e.target.value.toUpperCase();
   filterBtns.forEach(b => b.classList.remove('active'));
@@ -68,6 +109,7 @@ searchInput?.addEventListener('input', (e) => {
 });
 
 //filter
+
 filterBtns.forEach(btn => {
   btn.addEventListener('click', (e) => {
     if (searchInput) searchInput.value = '';
@@ -89,53 +131,238 @@ filterBtns.forEach(btn => {
   });
 });
 
+// export data (.csv)
+
+document.getElementById('download-csv')?.addEventListener('click', () => {
+  if (typeof players === 'undefined') return;
+  let csv = "data:text/csv;charset=utf-8,NAME,ROLE\n";
+  
+  players.forEach(p => {
+    csv += `"${p.name}","${p.role}"\n`;
+  });
+  
+  const encodedUri = encodeURI(csv);
+  const link = document.createElement("a");
+  link.setAttribute("href", encodedUri);
+  link.setAttribute("download", "kkr_roster_2026.csv");
+  document.body.appendChild(link); 
+  link.click();
+  link.remove();
+});
+
+//all time leaders
+
+let runsChart, wicketsChart, sixesChart;
+
+function renderCharts() {
+  const rootStyles = getComputedStyle(document.body);
+  const textColor = rootStyles.getPropertyValue('--text-color').trim() || '#000000';
+  const bgColor = rootStyles.getPropertyValue('--bg-color').trim() || '#f4f4f0';
+  const primaryColor = rootStyles.getPropertyValue('--primary').trim() || '#3A225D';
+  const secondaryColor = rootStyles.getPropertyValue('--secondary').trim() || '#B3A123';
+
+  Chart.defaults.font.family = "'Courier New', monospace";
+  Chart.defaults.color = textColor;
+  Chart.defaults.scale.grid.color = textColor + '20'; 
+
+  if (runsChart) runsChart.destroy();
+  if (wicketsChart) wicketsChart.destroy();
+  if (sixesChart) sixesChart.destroy();
+
+  const runsCtx = document.getElementById('runsChart');
+  if (runsCtx) {
+    runsChart = new Chart(runsCtx, {
+      type: 'bar',
+      data: {
+        labels: ['GAMBHIR', 'UTHAPPA', 'RUSSELL', 'RANA', 'NARINE'],
+        datasets: [{
+          label: 'ALL-TIME RUNS',
+          data: [3035, 2439, 2326, 2019, 1534],
+          backgroundColor: primaryColor, 
+          borderColor: textColor, 
+          borderWidth: 4, 
+          borderRadius: 0
+        }]
+      },
+      options: {
+        maintainAspectRatio: false,
+        plugins: {
+          title: { display: true, text: 'MOST RUNS', font: { family: "'Impact', sans-serif", size: 24 } },
+          legend: { display: false }
+        }
+      }
+    });
+  }
+
+  const wicketsCtx = document.getElementById('wicketsChart');
+  if (wicketsCtx) {
+    wicketsChart = new Chart(wicketsCtx, {
+      type: 'doughnut',
+      data: {
+        labels: ['NARINE', 'RUSSELL', 'CHAKARAVARTHY', 'CHAWLA', 'YADAV'],
+        datasets: [{
+          data: [180, 105, 84, 66, 48],
+          backgroundColor: [primaryColor, secondaryColor, textColor, '#555555', '#999999'],
+          borderColor: bgColor, 
+          borderWidth: 4
+        }]
+      },
+      options: {
+        maintainAspectRatio: false,
+        cutout: '60%', 
+        plugins: {
+          title: { display: true, text: 'MOST WICKETS', font: { family: "'Impact', sans-serif", size: 24 } }
+        }
+      }
+    });
+  }
+
+  const sixesCtx = document.getElementById('sixesChart');
+  if (sixesCtx) {
+    sixesChart = new Chart(sixesCtx, {
+      type: 'bar',
+      data: {
+        labels: ['RUSSELL', 'RANA', 'NARINE', 'UTHAPPA', 'Y. PATHAN'],
+        datasets: [{
+          label: 'ALL-TIME SIXES',
+          data: [203, 106, 94, 85, 85],
+          backgroundColor: secondaryColor,
+          borderColor: textColor,
+          borderWidth: 4,
+          borderRadius: 0
+        }]
+      },
+      options: {
+        maintainAspectRatio: false,
+        indexAxis: 'y', 
+        plugins: {
+          title: { display: true, text: 'MOST SIXES', font: { family: "'Impact', sans-serif", size: 24 } },
+          legend: { display: false }
+        }
+      }
+    });
+  }
+}
+document.addEventListener('DOMContentLoaded', renderCharts);
+
 //hall of fame
+
 function renderHallOfFame() {
   if (!hofGrid || typeof hallOfFame === 'undefined') return;
-  let html = '';
-  hallOfFame.forEach(legend => {
-    html += `
-      <article class="card">
-        <div class="card-header">
-          <h3 class="player-name">${legend.name.toUpperCase()}</h3>
-          <span class="player-role">${legend.role.toUpperCase()}</span>
+  
+  const hofHTML = hallOfFame.map(legend => `
+    <article class="hof-card">
+      <div class="card-header">
+        <h3 class="player-name">${legend.name.toUpperCase()}</h3>
+        <span class="player-role">${legend.role.toUpperCase()}</span>
+      </div>
+      
+      <div class="card-image-box">
+        <img src="${legend.image}" alt="${legend.name}" onerror="this.src='https://placehold.co/300x300/000000/B3A123?text=LEGEND&font=Impact'">
+      </div>
+
+      <div class="hof-content">
+        <p class="hof-desc">${legend.description}</p>
+        
+        <div class="hof-achievement">
+          <span class="highlight-label">ACHIEVEMENT:</span>
+          <p>${legend.achievements}</p>
         </div>
-        <div class="card-image-box">
-          <img src="${legend.image}" alt="${legend.name}" onerror="this.src='https://placehold.co/300x300/000000/B3A123?text=LEGEND&font=Impact'">
+
+        <div class="hof-stats-grid">
+          ${Object.entries(legend.stats || {}).map(([label, value]) => `
+            <div class="hof-stat-box">
+              <div class="hof-stat-label">${label.toUpperCase()}</div>
+              <div class="hof-stat-value">${value}</div>
+            </div>
+          `).join('')}
         </div>
-        <div style="padding: 1.5rem; border-top: var(--border-size); flex-grow: 1;">
-          <strong style="color: var(--primary);">ACHIEVEMENT:</strong><br/> 
-          <span style="font-size: 1.1rem; display: block; margin-top: 0.5rem;">${legend.achievements.toUpperCase()}</span>
-        </div>
-      </article>
-    `;
-  });
-  hofGrid.innerHTML = html;
+      </div>
+    </article>
+  `).join('');
+
+  hofGrid.innerHTML = hofHTML;
 }
 renderHallOfFame();
 
-//timeline
+//greatest victories
+
 function renderTimeline() {
-  if (!timelineBox || typeof milestones === 'undefined') return;
+  const box = document.getElementById('timeline-box');
+  
+  if (!box) {
+    console.error("Timeline Box missing! Check your HTML ID.");
+    return;
+  }
+  if (typeof milestones === 'undefined') {
+    console.error("Milestones data missing! Check your data.js file.");
+    return;
+  }
+
   let html = '';
+  
   milestones.forEach(event => {
     html += `
-      <div class="timeline-item">
-        <h3 style="font-family: var(--font-heading); font-size: 2.5rem; color: var(--primary);">${event.year} - ${event.title.toUpperCase()}</h3>
-        <p style="font-size: 1.2rem; margin-top: 1rem; border-top: 2px dashed var(--text-color); padding-top: 1rem;">${event.details.toUpperCase()}</p>
+      <div class="timeline-wrapper">
+        <div class="timeline-node"></div>
+        <article class="timeline-card" onclick="this.classList.toggle('expanded')">
+          
+          <div class="timeline-always-visible">
+            <div class="timeline-year-title">
+              <span class="timeline-year">${event.year}</span>
+              <h3 class="timeline-title">${event.title.toUpperCase()}</h3>
+            </div>
+            <div class="timeline-opponent">VS ${event.opponent.toUpperCase()}</div>
+            <div class="expand-icon">+</div>
+          </div>
+
+          <div class="timeline-expandable">
+            <p class="timeline-summary">${event.summary.toUpperCase()}</p>
+            
+            <div class="timeline-data-grid">
+              <div class="timeline-data-box">
+                <div class="timeline-label">KEY PERFOARMERS</div>
+                <div class="timeline-value">${event.performers.toUpperCase()}</div>
+              </div>
+              <div class="timeline-data-box">
+                <div class="timeline-label">MATCH STATS</div>
+                <div class="timeline-value">${event.stats.toUpperCase()}</div>
+              </div>
+            </div>
+
+            <a href="${event.link}" target="_blank" class="btn alt-btn timeline-btn" onclick="event.stopPropagation()">WATCH HIGHLIGHTS</a>
+          </div>
+
+        </article>
       </div>
     `;
   });
-  timelineBox.innerHTML = html;
+  
+  box.innerHTML = html;
 }
-renderTimeline();
+document.addEventListener('DOMContentLoaded', renderTimeline);
 
-//theme
-darkModeBtn?.addEventListener('click', () => {
-  document.body.classList.toggle('dark-mode');
-});
+//franchise records
+
+function renderRecords() {
+  const grid = document.getElementById('records-grid');
+  if (!grid || typeof teamRecords === 'undefined') return;
+
+  const html = teamRecords.map(record => `
+    <article class="record-card">
+      <div class="record-label">${record.label}</div>
+      <div class="record-value">${record.value}</div>
+      <div class="record-player">${record.player}</div>
+      <div class="record-detail">${record.detail}</div>
+    </article>
+  `).join('');
+
+  grid.innerHTML = html;
+}
+document.addEventListener('DOMContentLoaded', renderRecords);
 
 //quiz
+
 let currentQIndex = 0;
 let score = 0;
 document.getElementById('start-btn')?.addEventListener('click', loadNextQuestion);
@@ -174,38 +401,4 @@ function showFinalScore() {
     <br>
     <button class="btn alt-btn" onclick="location.reload()">PLAY AGAIN</button>
   `;
-}
-
-//csv
-document.getElementById('download-csv')?.addEventListener('click', () => {
-  if (typeof players === 'undefined') return;
-  let csv = "data:text/csv;charset=utf-8,NAME,ROLE\n";
-  
-  players.forEach(p => {
-    csv += `"${p.name}","${p.role}"\n`;
-  });
-  
-  const encodedUri = encodeURI(csv);
-  const link = document.createElement("a");
-  link.setAttribute("href", encodedUri);
-  link.setAttribute("download", "kkr_roster_2026.csv");
-  document.body.appendChild(link); 
-  link.click();
-  link.remove();
-});
-
-//scroll
-const scrollObserver = new IntersectionObserver((entries) => {
-  entries.forEach(entry => {
-    if (entry.isIntersecting) {
-      entry.target.classList.add('in-view');
-    }
-  });
-}, { threshold: 0.1 });
-
-function observeCards() {
-  setTimeout(() => {
-    const cards = document.querySelectorAll('.card');
-    cards.forEach(card => scrollObserver.observe(card));
-  }, 100);
 }
