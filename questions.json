@@ -1,0 +1,26 @@
+[
+  {
+    "id": 1,
+    "question": "Who hit 5 consecutive sixes in the final over to win the match against GT?",
+    "options": ["Andre Russell", "Rinku Singh", "Sunil Narine"],
+    "correctAnswer": "Rinku Singh"
+  },
+  {
+    "id": 2,
+    "question": "How many IPL titles have KKR won?",
+    "options": ["Two", "Three", "Four"],
+    "correctAnswer": "Three"
+  },
+  {
+    "id": 3,
+    "question": "Who is KKR's all-time leading wicket-taker",
+    "options": ["Sunil Narine", "Piyush Chawla", "Umesh Yadav"],
+    "correctAnswer": "Sunil Narine"
+  },
+  {
+    "id": 4,
+    "question": "Who scored a match-winning 89 off 48 balls in the 2012 IPL Final?",
+    "options": ["Gautam Gambhir", "Jacques Kallis", "Manvinder Bisla"],
+    "correctAnswer": "Manvinder Bisla"
+  }
+]

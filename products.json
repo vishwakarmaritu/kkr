@@ -1,0 +1,34 @@
+[
+  {
+    "id": 1,
+    "name": "KKR OFFICIAL MATCH JERSEY 2024",
+    "price": 1999,
+    "originalPrice": 2499,
+    "offerTag": "20% OFF",
+    "image": "assets/images/jersey.png"
+  },
+  {
+    "id": 2,
+    "name": "KNIGHT RIDERS TRAINING CAP",
+    "price": 899,
+    "originalPrice": 1200,
+    "offerTag": "HOT SELLER",
+    "image": "assets/images/cap.png"
+  },
+  {
+    "id": 3,
+    "name": "EDEN GARDENS COFFEE MUG",
+    "price": 499,
+    "originalPrice": 699,
+    "offerTag": "SAVE ₹200",
+    "image": "assets/images/cup.png"
+  },
+  {
+    "id": 4,
+    "name": "KORBO LORBO WRISTBAND",
+    "price": 299,
+    "originalPrice": 299,
+    "offerTag": "",
+    "image": "assets/images/band.png"
+  }
+]

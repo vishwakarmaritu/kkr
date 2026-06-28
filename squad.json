@@ -1,0 +1,35 @@
+[
+  {
+    "name": "AJINKYA RAHANE",
+    "role": "BATTER / CAPTAIN",
+    "nationality": "INDIA",
+    "image": "https://www.kkr.in/static-assets/images/players/3991.png?v=112.13",
+    "bio": "CLASSICAL TOP-ORDER BATSMAN BRINGING CALM LEADERSHIP AND EXPERIENCE TO THE REARGUARD.",
+    "stats": {
+      "matches": "185",
+      "record": "4600"
+    }
+  },
+  {
+    "name": "SUNIL NARINE",
+    "role": "ALL-ROUNDER",
+    "nationality": "WEST INDIES",
+    "image": "https://www.kkr.in/static-assets/images/players/11229.png?v=112.13",
+    "bio": "THE GREATEST FRANCHISE ASSET IN IPL HISTORY. MYSTERY SPINNER AND MERCILESS OPENING DESTROYER.",
+    "stats": {
+      "matches": "180",
+      "record": "1540"
+    }
+  },
+  {
+    "name": "BLESSING MUZARABANI",
+    "role": "BOWLER",
+    "nationality": "ZIMBABWE",
+    "image": "https://www.kkr.in/static-assets/images/players/67784.png?v=112.13",
+    "bio": "TOWERING SPEEDSTER WITH ACUTE BOUNCE AND PRECISION CHANNELS DESIGNED TO CONTAIN.",
+    "stats": {
+      "matches": "5",
+      "record": "6"
+    }
+  }
+]

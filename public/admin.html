@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KKR ADMIN PORTAL</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .admin-form-box {
+      max-width: 600px;
+      margin: 4rem auto;
+      background: var(--bg-color);
+      border: 4px solid var(--text-color);
+      box-shadow: 12px 12px 0px var(--primary);
+      padding: 2.5rem;
+    }
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      margin-bottom: 1.5rem;
+    }
+    .form-group label {
+      font-family: var(--font-heading);
+      font-size: 1.1rem;
+      letter-spacing: 1px;
+    }
+    .form-group input, .form-group textarea {
+      padding: 0.8rem;
+      border: 3px solid var(--text-color);
+      font-family: var(--font-body);
+      font-size: 1rem;
+    }
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+  </style>
+</head>
+<body>
+
+  <main class="admin-form-box">
+    <header class="heading" style="margin-bottom: 2rem;">
+      <h2>ADD NEW PLAYER</h2>
+    </header>
+    
+    <form id="playerForm">
+      <div class="form-group">
+        <label>PLAYER NAME</label>
+        <input type="text" id="pName" required placeholder="EG. SHREYAS IYER">
+      </div>
+      
+      <div class="form-row">
+        <div class="form-group">
+          <label>ROLE DESCRIPTION</label>
+          <input type="text" id="pRole" required placeholder="EG. BATTER // CAPTAIN">
+        </div>
+        <div class="form-group">
+          <label>NATIONALITY</label>
+          <input type="text" id="pNat" placeholder="EG. DOMESTIC // OVERSEAS">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>IMAGE URL</label>
+        <input type="url" id="pImage" placeholder="https://url-to-png.png">
+      </div>
+
+      <div class="form-group">
+        <label>PLAYER BIO SUMMARY</label>
+        <textarea id="pBio" rows="3" placeholder="WRITE GRITTY STATEMENTS..."></textarea>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>MATCHES</label>
+          <input type="number" id="sMatches" value="0">
+        </div>
+        <div class="form-group">
+          <label>RUNS / WICKETS</label>
+          <input type="text" id="sMetric" placeholder="EG. 3127">
+        </div>
+      </div>
+
+      <button type="submit" class="btn alt-btn" style="width: 100%; font-size: 1.5rem; margin-top: 1rem;">PUBLISH PLAYER CARD</button>
+    </form>
+  </main>
+
+  <script>
+    document.getElementById('playerForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      const payload = {
+        name: document.getElementById('pName').value,
+        role: document.getElementById('pRole').value,
+        nationality: document.getElementById('pNat').value,
+        image: document.getElementById('pImage').value,
+        bio: document.getElementById('pBio').value,
+        stats: {
+          matches: document.getElementById('sMatches').value,
+          record: document.getElementById('sMetric').value || "N/A"
+        }
+      };
+
+      fetch('/api/players', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      })
+      .then(res => res.json())
+      .then(data => {
+        if(data.success) {
+          alert("CARD DISPATCHED TO SYSTEM SQUAD DATABASE!");
+          window.location.href = "index.html"; 
+        }
+      })
+      .catch(err => alert("CRITICAL FILE ERROR DURING TRANSMISSION. CHECK CONSOLE."));
+    });
+  </script>
+</body>
+</html>
